@@ -184,3 +184,23 @@ sentinel-1-rtc:
     wavelength:
       vv: 3.5
       vh: 4.0
+
+deepglobe-roads: 
+  rgb_indices:
+    - 0
+    - 1
+    - 2
+  gsd: 0.5
+  bands:
+    mean:
+      red: 104.3915
+      green: 97.4842
+      blue: 73.2778
+    std:
+      red: 39.9518
+      green: 32.3603
+      blue: 31.2896
+    wavelength:
+      red: 0.635
+      green: 0.555
+      blue: 0.465

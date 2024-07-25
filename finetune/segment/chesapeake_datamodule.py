@@ -23,6 +23,8 @@ import yaml
 from box import Box
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import v2
+from torchvision.tv_tensors import Mask
+from PIL import Image
 
 
 class ChesapeakeDataset(Dataset):
@@ -92,6 +94,57 @@ class ChesapeakeDataset(Dataset):
         sample = {
             "pixels": self.transform(torch.from_numpy(chip)),
             "label": torch.from_numpy(remapped_label[0]),
+            "time": torch.zeros(4),  # Placeholder for time information
+            "latlon": torch.zeros(4),  # Placeholder for latlon information
+        }
+        return sample
+    
+
+class DeepGlobeDataset(Dataset):
+    train_transforms = [
+        v2.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3),
+        v2.RandomHorizontalFlip(p=0.5),
+        v2.RandomAffine(degrees=(-30, 30), scale=(0.8, 1.2)),
+    ]
+
+    all_transforms = [v2.ToImage()]
+
+    def __init__(self, chip_dir, label_dir, metadata, platform):
+        self.chip_dir = chip_dir
+        self.label_dir = label_dir
+
+        if "train" in chip_dir:
+            self.transform = v2.Compose(
+                self.all_transforms + self.train_transforms
+            )
+        elif "val" in chip_dir:
+            self.transform = v2.Compose(self.all_transforms)
+        else:
+            raise ValueError("Unknown dataset split")
+        
+        self.filenames = [
+            f.stem for f in (Path(chip_dir)).glob("*")
+        ]
+
+    def __len__(self):
+        return len(self.filenames)
+
+    def __getitem__(self, index):
+        f = self.filenames[index]
+
+        image = Image.open(str(Path(self.chip_dir) / (f + ".png")))
+        mask = Mask(
+            Image.open(
+                str(Path(self.label_dir) / (f + ".png"))
+            ).convert("1")
+        )
+
+        if self.transform:
+            image, mask = self.transform(image, mask)
+
+        sample = {
+            "pixels": image / 255.0,
+            "label": mask.float(),
             "time": torch.zeros(4),  # Placeholder for time information
             "latlon": torch.zeros(4),  # Placeholder for latlon information
         }
