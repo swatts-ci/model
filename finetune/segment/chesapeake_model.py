@@ -65,8 +65,8 @@ class ChesapeakeSegmentor(L.LightningModule):
         Returns:
             torch.Tensor: The segmentation logits.
         """
-        waves = torch.tensor([0.65, 0.56, 0.48, 0.842])  # NAIP wavelengths
-        gsd = torch.tensor(1.0)  # NAIP GSD
+        waves = torch.tensor([0.630, 0.532, 0.465])  # deepglobe, I just copied these from google :D
+        gsd = torch.tensor(0.5)  # deepglobe
 
         # Forward pass through the network
         return self.model(
