@@ -144,7 +144,7 @@ class DeepGlobeDataset(Dataset):
 
         sample = {
             "pixels": image / 255.0,
-            "label": mask.float(),
+            "label": mask.float().squeeze(0),
             "time": torch.zeros(4),  # Placeholder for time information
             "latlon": torch.zeros(4),  # Placeholder for latlon information
         }
@@ -195,13 +195,13 @@ class ChesapeakeDataModule(L.LightningDataModule):
             stage (str): Stage identifier ('fit' or 'test').
         """
         if stage in {"fit", None}:
-            self.trn_ds = ChesapeakeDataset(
+            self.trn_ds = DeepGlobeDataset(
                 self.train_chip_dir,
                 self.train_label_dir,
                 self.metadata,
                 self.platform,
             )
-            self.val_ds = ChesapeakeDataset(
+            self.val_ds = DeepGlobeDataset(
                 self.val_chip_dir,
                 self.val_label_dir,
                 self.metadata,

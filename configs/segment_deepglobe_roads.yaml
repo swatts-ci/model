@@ -1,13 +1,13 @@
 # lightning.pytorch==2.1.2
 seed_everything: 42
 data:
-  train_chip_dir: data/deepglobe/train_crops/images/
-  train_label_dir: data/deepglobe/train_crops/gt/
-  val_chip_dir: data/deepglobe/val_crops/images/
-  val_label_dir: data/deepglobe/val_crops/gt/
+  train_chip_dir: ../data/deepglobe/train_crops/images/
+  train_label_dir: ../data/deepglobe/train_crops/gt/
+  val_chip_dir: ../data/deepglobe/val_crops/images/
+  val_label_dir: ../data/deepglobe/val_crops/gt/
   metadata_path: configs/metadata.yaml
-  batch_size: 40
-  num_workers: 8
+  batch_size: 4
+  num_workers: 4
   platform: deepglobe-roads
 model:
   num_classes: 2
@@ -44,7 +44,7 @@ trainer:
       init_args:
         dirpath: checkpoints/segment
         auto_insert_metric_name: False
-        filename: deepgloe-roads-segment_epoch-{epoch:02d}_val-iou-{val/iou:.4f}
+        filename: deepglobe-roads-segment_epoch-{epoch:02d}_val-iou-{val/iou:.4f}
         monitor: val/iou
         mode: max
         save_last: True

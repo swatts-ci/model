@@ -128,7 +128,7 @@ class ChesapeakeSegmentor(L.LightningModule):
         outputs = self(batch)
         outputs = F.interpolate(
             outputs,
-            size=(224, 224),
+            size=(512, 512),
             mode="bilinear",
             align_corners=False,
         )  # Resize to match labels size
