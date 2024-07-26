@@ -193,13 +193,13 @@ deepglobe-roads:
   gsd: 0.5
   bands:
     mean:
-      red: 104.3915
-      green: 97.4842
-      blue: 73.2778
+      red: 104.4822
+      green: 97.5419
+      blue: 73.3386
     std:
-      red: 39.9518
-      green: 32.3603
-      blue: 31.2896
+      red: 40.0120
+      green: 32.4242
+      blue: 31.3541
     wavelength:
       red: 0.635
       green: 0.555

@@ -107,18 +107,28 @@ class DeepGlobeDataset(Dataset):
         v2.RandomAffine(degrees=(-30, 30), scale=(0.8, 1.2)),
     ]
 
-    all_transforms = [v2.ToImage()]
+    all_transforms = [
+        v2.ToImage(),
+        v2.ToDtype(torch.float64),
+    ]
 
     def __init__(self, chip_dir, label_dir, metadata, platform):
         self.chip_dir = chip_dir
         self.label_dir = label_dir
 
+        norm_transform = [
+            v2.Normalize(
+                mean=list(metadata[platform].bands.mean.values()), 
+                std=list(metadata[platform].bands.std.values()),
+            )
+        ]
+
         if "train" in chip_dir:
             self.transform = v2.Compose(
-                self.all_transforms + self.train_transforms
+                self.all_transforms + self.train_transforms + norm_transform
             )
         elif "val" in chip_dir:
-            self.transform = v2.Compose(self.all_transforms)
+            self.transform = v2.Compose(self.all_transforms + norm_transform)
         else:
             raise ValueError("Unknown dataset split")
         
@@ -143,7 +153,7 @@ class DeepGlobeDataset(Dataset):
             image, mask = self.transform(image, mask)
 
         sample = {
-            "pixels": image / 255.0,
+            "pixels": image,
             "label": mask.float().squeeze(0),
             "time": torch.zeros(4),  # Placeholder for time information
             "latlon": torch.zeros(4),  # Placeholder for latlon information
@@ -222,7 +232,7 @@ class ChesapeakeDataModule(L.LightningDataModule):
             num_workers=self.num_workers,
         )
 
-    def val_dataloader(self):
+    def val_dataloader(self, shuffle=False):
         """
         Create DataLoader for validation data.
 
@@ -233,4 +243,5 @@ class ChesapeakeDataModule(L.LightningDataModule):
             self.val_ds,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
+            shuffle=shuffle,
         )

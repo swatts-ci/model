@@ -8,7 +8,7 @@ import segmentation_models_pytorch as smp
 import torch
 import torch.nn.functional as F
 from torch import optim
-from torchmetrics.classification import F1Score, MulticlassJaccardIndex
+from torchmetrics.classification import BinaryF1Score, BinaryJaccardIndex
 
 from finetune.segment.factory import Segmentor
 
@@ -43,16 +43,9 @@ class ChesapeakeSegmentor(L.LightningModule):
             ckpt_path=ckpt_path,
         )
 
-        self.loss_fn = smp.losses.FocalLoss(mode="multiclass")
-        self.iou = MulticlassJaccardIndex(
-            num_classes=num_classes,
-            average="weighted",
-        )
-        self.f1 = F1Score(
-            task="multiclass",
-            num_classes=num_classes,
-            average="weighted",
-        )
+        self.loss_fn = smp.losses.FocalLoss(mode="binary")
+        self.iou = BinaryJaccardIndex()
+        self.f1 = BinaryF1Score()
 
     def forward(self, datacube):
         """
@@ -65,6 +58,7 @@ class ChesapeakeSegmentor(L.LightningModule):
         Returns:
             torch.Tensor: The segmentation logits.
         """
+        # TODO these are duplicated from config
         waves = torch.tensor([0.630, 0.532, 0.465])  # deepglobe, I just copied these from google :D
         gsd = torch.tensor(0.5)  # deepglobe
 
